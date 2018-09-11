@@ -1,5 +1,3 @@
-Project identityServer = parent.subprojects.find { it.name.equals('cloudfoundry-identity-server') }
-
 apply plugin: 'war'
 apply plugin: 'org.asciidoctor.convert'
 apply plugin: 'com.moowork.node'
@@ -11,24 +9,16 @@ processResources {
   filter { line -> line.contains('${project.artifactId}') ? line.replace('${project.artifactId}','cloudfoundry-identity-uaa') : line }
 }
 
-apply plugin: 'eclipse-wtp'
-eclipse {
-  wtp {
-    component {
-      contextPath = 'uaa'
-    }
-  }
-}
-
 repositories {
   maven { url 'https://repo.spring.io/libs-milestone' }
 }
 
 description = 'UAA'
 dependencies {
-  compile(project(':cloudfoundry-identity-server')){
+  testCompile(project(':cloudfoundry-identity-server')){
     exclude(module: 'jna')
   }
+
   compile group: 'cglib', name: 'cglib', version:parent.cglibVersion
   runtime group: 'org.springframework.security', name: 'spring-security-config', version:parent.springSecurityVersion
   runtime group: 'org.springframework.retry', name: 'spring-retry', version:parent.springRetryVersion
@@ -36,8 +26,8 @@ dependencies {
   runtime group: 'org.postgresql', name: 'postgresql', version:parent.postgresqlVersion
   providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: parent.servletVersion
 
-  testCompile identityServer.configurations.testCompile.dependencies
-  testCompile identityServer.sourceSets.test.output
+  testCompile project(':cloudfoundry-identity-server').configurations.testCompile.dependencies
+  testCompile project(':cloudfoundry-identity-server').sourceSets.test.output
 
   testCompile(group: 'org.apache.directory.server', name: 'apacheds-core', version:'1.5.5') {
     exclude(module: 'bcprov-jdk15')
@@ -81,6 +71,7 @@ ext {
   snippetsDir = file('build/generated-snippets')
 }
 test {
+  maxParallelForks 5
   exclude 'org/cloudfoundry/identity/uaa/integration/**/*.class'
   exclude 'org/cloudfoundry/identity/uaa/integration/*.class'
   exclude '**/*IT.class'

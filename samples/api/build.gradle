@@ -11,9 +11,12 @@ eclipse {
 description = 'Sample resource server for Cloudfoundry Identity Services'
 dependencies {
   Project identityParent = parent.parent
-  Project identityServer = identityParent.subprojects.find { it.name.equals('cloudfoundry-identity-server') }
+//  Project identityServer = identityParent.subprojects.find { it.name.equals('cloudfoundry-identity-server') }
+    compile(project(':cloudfoundry-identity-server')){
+        exclude(module: 'jna')
+    }
 
-  compile identityServer
+//  compile identityServer
 
   providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version:parent.servletVersion
   compile(group: 'org.springframework.security', name: 'spring-security-taglibs', version:identityParent.springSecurityVersion) {
@@ -22,8 +25,8 @@ dependencies {
   }
   compile group: 'org.springframework.security', name: 'spring-security-config', version:identityParent.springSecurityVersion
 
-  testCompile identityServer.configurations.testCompile.dependencies
-  testCompile identityServer.sourceSets.test.output
+//  testCompile identityServer.configurations.testCompile.dependencies
+//  testCompile identityServer.sourceSets.test.output
 }
 
 test {

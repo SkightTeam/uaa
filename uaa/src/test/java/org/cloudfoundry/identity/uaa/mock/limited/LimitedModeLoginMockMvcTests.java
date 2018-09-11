@@ -18,6 +18,7 @@ package org.cloudfoundry.identity.uaa.mock.limited;
 import org.cloudfoundry.identity.uaa.login.LoginMockMvcTests;
 import org.junit.After;
 import org.junit.Before;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.io.File;
 
@@ -25,6 +26,7 @@ import static org.cloudfoundry.identity.uaa.mock.util.MockMvcUtils.getLimitedMod
 import static org.cloudfoundry.identity.uaa.mock.util.MockMvcUtils.resetLimitedModeStatusFile;
 import static org.cloudfoundry.identity.uaa.mock.util.MockMvcUtils.setLimitedModeStatusFile;
 
+@DirtiesContext
 public class LimitedModeLoginMockMvcTests extends LoginMockMvcTests {
 
     private File statusFile;

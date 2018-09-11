@@ -14,7 +14,6 @@
  */
 package org.cloudfoundry.identity.uaa.login;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.codec.binary.Base64;
 import org.cloudfoundry.identity.uaa.authentication.UaaAuthentication;
 import org.cloudfoundry.identity.uaa.authentication.UaaPrincipal;

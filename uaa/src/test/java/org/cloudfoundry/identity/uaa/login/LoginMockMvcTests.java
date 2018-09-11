@@ -71,13 +71,14 @@ import org.springframework.security.web.PortResolverImpl;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.springframework.security.web.savedrequest.SavedRequest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.support.XmlWebApplicationContext;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
@@ -150,20 +151,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.xpath;
 
+@DirtiesContext
 public class LoginMockMvcTests extends InjectedMockContextTest {
-
-    private MockEnvironment mockEnvironment;
-
-    private MockPropertySource propertySource;
-
-    private Properties originalProperties = new Properties();
-
-    Field f = ReflectionUtils.findField(MockEnvironment.class, "propertySource");
 
     private RandomValueStringGenerator generator = new RandomValueStringGenerator();
 
     private String adminToken;
-    private XmlWebApplicationContext webApplicationContext;
+    private WebApplicationContext webApplicationContext;
     private IdentityZoneConfiguration originalConfiguration;
     private IdentityZoneConfiguration identityZoneConfiguration;
     private Links globalLinks;
@@ -175,12 +169,6 @@ public class LoginMockMvcTests extends InjectedMockContextTest {
         globalLinks = getWebApplicationContext().getBean("globalLinks", Links.class);
         SecurityContextHolder.clearContext();
         webApplicationContext = getWebApplicationContext();
-        mockEnvironment = (MockEnvironment) webApplicationContext.getEnvironment();
-        f.setAccessible(true);
-        propertySource = (MockPropertySource)ReflectionUtils.getField(f, mockEnvironment);
-        for (String s : propertySource.getPropertyNames()) {
-            originalProperties.put(s, propertySource.getProperty(s));
-        }
         adminToken = MockMvcUtils.getClientCredentialsOAuthAccessToken(getMockMvc(), "admin", "adminsecret", null, null);
         originalConfiguration = getWebApplicationContext().getBean(IdentityZoneProvisioning.class).retrieve(getUaa().getId()).getConfig();
         identityZoneConfiguration = getWebApplicationContext().getBean(IdentityZoneProvisioning.class).retrieve(getUaa().getId()).getConfig();
@@ -218,10 +206,6 @@ public class LoginMockMvcTests extends InjectedMockContextTest {
         setSelfServiceLinksEnabled(true);
         setDisableInternalUserManagement(false);
         setZoneConfiguration(originalConfiguration);
-        mockEnvironment.getPropertySources().remove(MockPropertySource.MOCK_PROPERTIES_PROPERTY_SOURCE_NAME);
-        MockPropertySource originalPropertySource = new MockPropertySource(originalProperties);
-        ReflectionUtils.setField(f, mockEnvironment, new MockPropertySource(originalProperties));
-        mockEnvironment.getPropertySources().addLast(originalPropertySource);
         SecurityContextHolder.clearContext();
         IdentityZoneHolder.clear();
     }
@@ -582,10 +566,8 @@ public class LoginMockMvcTests extends InjectedMockContextTest {
 
     @Test
     public void testDefaultLogo() throws Exception {
-        mockEnvironment.setProperty("assetBaseUrl", "//cdn.example.com/resources");
-
         getMockMvc().perform(get("/login"))
-                .andExpect(content().string(containsString("url(//cdn.example.com/resources/images/product-logo.png)")));
+                .andExpect(content().string(containsString("url(/resources//oss/images/product-logo.png)")));
     }
 
     @Test
@@ -1039,8 +1021,8 @@ public class LoginMockMvcTests extends InjectedMockContextTest {
 
     @Test
     public void testLoginWithAnalytics() throws Exception {
-        mockEnvironment.setProperty("analytics.code", "secret_code");
-        mockEnvironment.setProperty("analytics.domain", "example.com");
+//        mockEnvironment.setProperty("analytics.code", "secret_code");
+//        mockEnvironment.setProperty("analytics.domain", "example.com");
 
         getMockMvc().perform(get("/login").accept(TEXT_HTML))
                 .andExpect(status().isOk())
@@ -1054,7 +1036,7 @@ public class LoginMockMvcTests extends InjectedMockContextTest {
             .andExpect(xpath("//head/link[@href='/resources/oss/stylesheets/application.css']").exists())
             .andExpect(xpath("//head/style[text()[contains(.,'/resources/oss/images/product-logo.png')]]").exists());
 
-        mockEnvironment.setProperty("assetBaseUrl", "//cdn.example.com/pivotal");
+//        mockEnvironment.setProperty("assetBaseUrl", "//cdn.example.com/pivotal");
 
         getMockMvc().perform(MockMvcRequestBuilders.get("/login"))
             .andExpect(xpath("//head/link[@rel='shortcut icon']/@href").string("//cdn.example.com/pivotal/images/square-logo.png"))

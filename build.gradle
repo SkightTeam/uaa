@@ -157,6 +157,8 @@ task manifests(dependsOn: assemble, type: Copy) {
 subprojects {
     apply plugin: 'java'
 
+//    gradle.addListener new TimingsListener()
+
     dependencies {
         testCompile('com.github.sbrannen:spring-test-junit5:1.2.0')
         testCompile("org.junit.jupiter:junit-jupiter-api:5.2.0")
@@ -170,6 +172,7 @@ subprojects {
     test {
         useJUnitPlatform()
         jvmArgs += ["-Xmx1024m", "-XX:+StartAttachListener"]
+        maxParallelForks 5
     }
 
     task integrationTest(type: Test) {
@@ -354,10 +357,10 @@ assemble.dependsOn subprojects.assemble
 task integrationTest {
     finalizedBy cargoStopLocal
 }
-integrationTest.dependsOn subprojects.integrationTest
+//integrationTest.dependsOn subprojects.integrationTest
 
-test.dependsOn subprojects.test
-test.mustRunAfter integrationTest
+//test.dependsOn subprojects.test
+//test.mustRunAfter integrationTest
 
 task mockAssertion(type: JavaExec) {
     main = 'org.cloudfoundry.identity.uaa.saml.MockSamlAssertion'
@@ -475,4 +478,4 @@ class TimingsListener implements TaskExecutionListener, BuildListener, org.gradl
     void settingsEvaluated(Settings settings) {}
 }
 
-gradle.addListener new TimingsListener()
+//gradle.addListener new TimingsListener()

@@ -116,6 +116,9 @@ integrationTest {}.onlyIf { //disable since we don't have any
   false
 }
 
+test {
+  maxParallelForks 5
+}
 
 publishing {
   publications {

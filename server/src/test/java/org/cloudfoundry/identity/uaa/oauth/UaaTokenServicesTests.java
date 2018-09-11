@@ -327,7 +327,7 @@ public class UaaTokenServicesTests {
         public void happyCase() {
             OAuth2AccessToken refreshedToken = tokenServices.refreshAccessToken(this.refreshToken.getValue(), new TokenRequest(new HashMap<>(), "jku_test", Lists.newArrayList("openid", "user_attributes"), GRANT_TYPE_REFRESH_TOKEN));
 
-            assertThat(refreshedToken, is(notNullValue()));
+            assertThat(refreshedToken.getValue(), refreshedToken, is(notNullValue()));
         }
 
         @Nested

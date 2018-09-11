@@ -53,3 +53,20 @@ LOGIN_SECRET: loginsecret
 jwt:
   token:
     signing-key: tokenKey
+
+uaa:
+  url: http://localhost:8080/uaa
+
+database:
+  abandonedtimeout: 45
+  caseinsensitive: true
+  evictionintervalms: 30000
+  logabandoned: false
+  maxactive: 50
+  maxidle: 5
+  minidle: 3
+  removeabandoned: true
+  driverClassName: org.hsqldb.jdbcDriver
+  url: jdbc:hsqldb:mem:uaadb
+  username: sa
+  password: ''
